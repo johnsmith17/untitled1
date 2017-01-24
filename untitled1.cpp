@@ -11,7 +11,7 @@ float screen_x = 1280;
 float screen_y = 720;
 int framerate = 60;
 
-int stupid_variable = 1; // ensures that evaluation at line 123 will equal true the first time spacebar is pressed
+int stupid_variable = 1; // ensures that evaluation at input handling will equal true the first time spacebar is pressed
 						// (should probably be changed asap)
 class Player
 {
@@ -40,6 +40,8 @@ public:
 	Vector2f spd;
 	bool isActive = false;
 
+	vector<Bullet> bullets;
+
 	void SetSpeed(Vector2f p_pos, Vector2i m_pos, float spd_const)
 	{
 		spd.x = (spd_const * (m_pos.x - p_pos.x)) / sqrtf(((pow((m_pos.x - p_pos.x), 2)) + (pow((m_pos.y - p_pos.y), 2))));
@@ -48,9 +50,13 @@ public:
 
 	void UpdatePos()
 	{
-
 		pos.x += spd.x;
 		pos.y += spd.y;
+	}
+
+	void DeleteBullet()
+	{
+
 	}
 };
 
@@ -68,7 +74,7 @@ int main()
 	player.pos.y = screen_y/2;
 	player.spd.x = 0;
 	player.spd.y = 0;
-	
+
 	vector<Bullet> bullets;
 	bullets.push_back(Bullet()); // for safety
 	
