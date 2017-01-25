@@ -11,6 +11,8 @@ float screen_x = 1280;
 float screen_y = 720;
 int framerate = 60;
 
+int temp_count = 0;
+
 int stupid_variable = 1; // ensures that evaluation at input handling will equal true the first time spacebar is pressed
 						// (should probably be changed asap)
 class Player
@@ -36,6 +38,9 @@ public:
 class Bullet
 {
 public:
+
+	float height = 5;
+	float width = 5;
 	Vector2f pos = { 0,0 };
 	Vector2f spd;
 	bool isActive = false;
@@ -63,12 +68,50 @@ public:
 class Enemy
 {
 public:
-
+	Vector2f pos = { screen_x/2, screen_y/2 };
+	float width = 100;
+	float height = 100;
 };
+
+void CheckCollisionsForY(Bullet b, Enemy e)
+{
+	if (b.pos.y < e.pos.y + e.height && b.pos.y + b.height > e.pos.y + e.height)
+	{
+		//e.kill();
+	}
+
+	else if (b.pos.y + b.height > e.pos.y && b.pos.y < e.pos.y)
+	{
+		//e.kill()
+	}
+
+	else if (b.pos.y > e.pos.y && b.pos.y + b.height < e.pos.y + e.height)
+	{
+		//e.kill()
+	}
+}
+void CheckCollisionsForX(Bullet b, Enemy e)
+{
+	if (b.pos.x + b.width > e.pos.x && b.pos.x < e.pos.x)
+	{
+		CheckCollisionsForY(b, e);
+	}
+
+	else if (b.pos.x > e.pos.x && b.pos.x + b.width < e.pos.x + e.width)
+	{
+		CheckCollisionsForY(b, e);
+	}
+
+	else if (b.pos.x > e.pos.x && b.pos.x < e.pos.x + e.width)
+	{
+		CheckCollisionsForY(b, e);
+	}
+}
 
 int main()
 {
-	
+	Enemy enemy;
+
 	Player player;
 	player.pos.x = screen_x/2;
 	player.pos.y = screen_y/2;
@@ -142,7 +185,7 @@ int main()
 			stupid_variable -= 1;
 		}
 
-	
+		
 		player.UpdatePos();
 		player_sprite.setPosition(player.pos.x, player.pos.y);
 		player.spd.x = 0;
@@ -150,6 +193,7 @@ int main()
 		for (int i = 0; i < bullets.size(); i++)
 		{
 			bullets[i].UpdatePos();
+			CheckCollisionsForX(bullets[i], enemy);
 		}
 
 		window.clear();
