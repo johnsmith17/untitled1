@@ -45,8 +45,6 @@ public:
 	Vector2f spd;
 	bool isActive = false;
 
-	vector<Bullet> bullets;
-
 	void SetSpeed(Vector2f p_pos, Vector2i m_pos, float spd_const)
 	{
 		spd.x = (spd_const * (m_pos.x - p_pos.x)) / sqrtf(((pow((m_pos.x - p_pos.x), 2)) + (pow((m_pos.y - p_pos.y), 2))));
@@ -110,7 +108,7 @@ void CheckCollisionsForX(Bullet b, Enemy e)
 
 int main()
 {
-	Enemy enemy;
+	Enemy enemy1;
 
 	Player player;
 	player.pos.x = screen_x/2;
@@ -118,14 +116,8 @@ int main()
 	player.spd.x = 0;
 	player.spd.y = 0;
 
-	vector<Bullet> bullets;
-	bullets.push_back(Bullet()); // for safety
-	
-	vector<RectangleShape> bullet_sprites;
-	bullet_sprites.push_back(RectangleShape());
 
 	Time time;
-
 	RenderWindow window(VideoMode(screen_x, screen_y), "UNTITLED");
 	window.setFramerateLimit(framerate);
 	window.setMouseCursorVisible(false);
@@ -138,6 +130,11 @@ int main()
 
 	RectangleShape bullet_sprite(Vector2f(5, 5));
     bullet_sprite.setFillColor(Color::Yellow);
+
+	vector<Bullet> bullets;
+	bullets.push_back(Bullet()); //for safety
+	vector<RectangleShape> bullet_sprites;
+	bullet_sprites.push_back(RectangleShape()); 
 
 	while (window.isOpen())
 	{
@@ -178,7 +175,7 @@ int main()
 			bullets.push_back(Bullet());
 			bullets[bullets.size()-1].isActive = true;
 			bullets[bullets.size() - 1].pos = player.pos;
-			bullets[bullets.size()-1].SetSpeed(player.pos, mouse_pos, 20);
+			bullets[bullets.size()-1].SetSpeed(player.pos, mouse_pos, 10);
 			bullet_sprites.push_back(RectangleShape(Vector2f(5, 5)));
 			bullet_sprites[bullet_sprites.size()-1].setFillColor(Color::Yellow);
 			clock.restart();
@@ -193,7 +190,7 @@ int main()
 		for (int i = 0; i < bullets.size(); i++)
 		{
 			bullets[i].UpdatePos();
-			CheckCollisionsForX(bullets[i], enemy);
+			CheckCollisionsForX(bullets[i], enemy1);
 		}
 
 		window.clear();
