@@ -3,6 +3,7 @@
 #include <iostream>
 #include <cmath>
 #include <vector>
+#include <random>
 
 using namespace std;
 using namespace sf;
@@ -39,8 +40,9 @@ class Bullet
 {
 public:
 
-	float height = 5;
-	float width = 5;
+	float height=3;
+	float width=3;
+
 	Vector2f pos = { 0,0 };
 	Vector2f spd;
 	bool isActive = false;
@@ -59,17 +61,22 @@ public:
 
 	void DeleteBullet()
 	{
-
 	}
+
 };
 
 class Enemy
 {
 public:
+	bool isAlive = true;
 	Vector2f pos = { screen_x/2, screen_y/2 };
 	float width = 100;
 	float height = 100;
+	int health = 10;
+
+
 };
+
 
 void CheckCollisionsForY(Bullet b, Enemy e)
 {
@@ -122,14 +129,16 @@ int main()
 	window.setFramerateLimit(framerate);
 	window.setMouseCursorVisible(false);
 	Clock clock;
-	RectangleShape crosshair(Vector2f(10, 10));
+	RectangleShape crosshair(Vector2f(5, 5));
 	crosshair.setFillColor(Color::Red);
 
 	RectangleShape player_sprite(Vector2f(20, 8));
-	player_sprite.setFillColor(Color::Green);
+	player_sprite.setFillColor(Color:: Color(204,0,102));
 
-	RectangleShape bullet_sprite(Vector2f(5, 5));
-    bullet_sprite.setFillColor(Color::Yellow);
+	
+
+	RectangleShape enemy_sprite(Vector2f(enemy1.width, enemy1.height));
+	enemy_sprite.setFillColor(Color:: Color(153,0,153));
 
 	vector<Bullet> bullets;
 	bullets.push_back(Bullet()); //for safety
@@ -158,12 +167,10 @@ int main()
 		if (Keyboard::isKeyPressed(Keyboard::S))
 		{
 			player.spd.y = player.spd_mod;
-		
 		}
 		if (Keyboard::isKeyPressed(Keyboard::A))
 		{
 			player.spd.x = -player.spd_mod;
-			
 		}
 		if (Keyboard::isKeyPressed(Keyboard::D))
 		{
@@ -193,7 +200,9 @@ int main()
 			CheckCollisionsForX(bullets[i], enemy1);
 		}
 
-		window.clear();
+		window.clear(Color::Color(0, 25, 51));
+
+
 		window.draw(player_sprite);
 		window.draw(crosshair);
 		for (int i = 0; i < bullets.size(); i++)
@@ -201,6 +210,7 @@ int main()
 			bullet_sprites[i].setPosition(bullets[i].pos.x, bullets[i].pos.y);
 			window.draw(bullet_sprites[i]);
 		}
+		window.draw(enemy_sprite);
 		window.display();
 
 	}
