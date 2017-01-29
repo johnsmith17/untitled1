@@ -68,15 +68,29 @@ public:
 class Enemy
 {
 public:
+	Clock clock;
 	bool isAlive = true;
 	Vector2f pos = { screen_x/2, screen_y/2 };
 	float width = 100;
 	float height = 100;
 	int health = 10;
 
+	void SpawnEnemy(vector<Enemy>& vec, int time)
+	{
+		if (time > 5)
+		{
+			vec.push_back(Enemy());
+			vec[vec.size() - 1].pos = { float(rand() % 500) ,float(rand() % 500) }; // add better randomness
+			clock.restart();
+		}
+	}
 
 };
 
+class Objects
+{
+
+};
 
 void CheckCollisionsForY(Bullet b, Enemy e)
 {
@@ -115,6 +129,9 @@ void CheckCollisionsForX(Bullet b, Enemy e)
 
 int main()
 {
+	Time time;
+	Clock clock;
+
 	Enemy enemy1;
 
 	Player player;
@@ -123,20 +140,18 @@ int main()
 	player.spd.x = 0;
 	player.spd.y = 0;
 
-
-	Time time;
 	RenderWindow window(VideoMode(screen_x, screen_y), "UNTITLED");
 	window.setFramerateLimit(framerate);
 	window.setMouseCursorVisible(false);
-	Clock clock;
+	
 	RectangleShape crosshair(Vector2f(5, 5));
 	crosshair.setFillColor(Color::Red);
 
 	RectangleShape player_sprite(Vector2f(20, 8));
 	player_sprite.setFillColor(Color:: Color(204,0,102));
 
-	
-
+	vector<Enemy> enemies;
+	enemies.push_back(Enemy());
 	RectangleShape enemy_sprite(Vector2f(enemy1.width, enemy1.height));
 	enemy_sprite.setFillColor(Color:: Color(153,0,153));
 
@@ -147,7 +162,6 @@ int main()
 
 	while (window.isOpen())
 	{
-		
 		Event event;
 		while (window.pollEvent(event))
 		{
@@ -189,7 +203,7 @@ int main()
 			stupid_variable -= 1;
 		}
 
-		
+		enemy1.SpawnEnemy(enemies, enemy1.clock.getElapsedTime().asSeconds());
 		player.UpdatePos();
 		player_sprite.setPosition(player.pos.x, player.pos.y);
 		player.spd.x = 0;
