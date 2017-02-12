@@ -11,8 +11,8 @@ float screen_x = 1280;
 float screen_y = 720;
 int framerate = 60;
 
-int stupid_variable = 1; // ensures that evaluation at line 123 will equal true the first time spacebar is pressed
-						// (should probably be changed asap)
+int stupid_variable = 1; 
+
 class Player
 {
 public:
