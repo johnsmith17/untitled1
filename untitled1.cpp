@@ -45,7 +45,7 @@ public:
 
 	Vector2f pos = { 0,0 };
 	Vector2f spd;
-	bool isActive = false;
+	bool isActive = true;
 
 	void SetSpeed(Vector2f p_pos, Vector2i m_pos, float spd_const)
 	{
@@ -59,9 +59,14 @@ public:
 		pos.y += spd.y;
 	}
 
-	void DeleteBullet()
+	void DeleteBullet(Bullet bul)
 	{
-	}
+		if (bul.pos.x > screen_x || bul.pos.x < 0 || bul.pos.y > screen_y || bul.pos.y < 0)
+		{
+			isActive = false;
+		}
+	}	
+
 
 };
 
@@ -71,18 +76,25 @@ public:
 	Clock clock;
 	bool isAlive = true;
 	Vector2f pos = { screen_x/2, screen_y/2 };
-	float width = 100;
-	float height = 100;
+	float width = 30;
+	float height = 30;
 	int health = 10;
 
-	void SpawnEnemy(vector<Enemy>& vec, int time)
+	static void SpawnEnemy(vector<Enemy>& vec, vector<RectangleShape>& sprite_vec, Clock &time)
 	{
-		if (time > 5)
+		if (time.getElapsedTime().asSeconds() > 5)
 		{
 			vec.push_back(Enemy());
-			vec[vec.size() - 1].pos = { float(rand() % 500) ,float(rand() % 500) }; // add better randomness
-			clock.restart();
+			sprite_vec.push_back(RectangleShape(Vector2f(vec[vec.size()-1].width, vec[vec.size() - 1].height)));
+			vec[vec.size()-1].pos = { float(rand() % int(screen_x- vec[vec.size() - 1].width)) ,float(rand() % int(screen_y- vec[vec.size() - 1].height)) }; // add better randomness
+			time.restart();
 		}
+	}
+
+	void Kill()
+	{
+		//delete this;
+		cout << "hello";
 	}
 
 };
@@ -94,17 +106,20 @@ public:
 	{
 		if (b.pos.y < e.pos.y + e.height && b.pos.y + b.height > e.pos.y + e.height)
 		{
-			//e.kill();
+			e.isAlive = false;
+			cout << "hello";
 		}
 
 		else if (b.pos.y + b.height > e.pos.y && b.pos.y < e.pos.y)
 		{
-			//e.kill()
+			e.isAlive = false;
+			cout << "hello";
 		}
 
 		else if (b.pos.y > e.pos.y && b.pos.y + b.height < e.pos.y + e.height)
 		{
-			//e.kill()
+			e.isAlive = false;
+			cout << "hello";
 		}
 	}
 	static void CheckCollisionsForX(Bullet b, Enemy e)
@@ -112,6 +127,7 @@ public:
 		if (b.pos.x + b.width > e.pos.x && b.pos.x < e.pos.x)
 		{
 			CheckCollisionsForY(b, e);
+
 		}
 
 		else if (b.pos.x > e.pos.x && b.pos.x + b.width < e.pos.x + e.width)
@@ -124,6 +140,15 @@ public:
 			CheckCollisionsForY(b, e);
 		}
 	}
+
+	static void RemoveBullet(Bullet bul)
+	{
+		if (bul.pos.x > screen_x || bul.pos.x < 0 || bul.pos.y > screen_y || bul.pos.y < 0)
+		{
+
+		}
+		
+	}
 };
 
 int main()
@@ -133,7 +158,6 @@ int main()
 	Clock enemy_clock;
 	enemy_clock.restart();
 
-	Enemy enemy1;
 
 	Player player;
 	player.pos.x = screen_x/2;
@@ -153,11 +177,16 @@ int main()
 
 	vector<Enemy> enemies;
 	enemies.push_back(Enemy());
+	enemies[0].pos = { -1000,-1000 };
 	vector<RectangleShape> enemy_sprites;
+	enemy_sprites.push_back(RectangleShape());
 	
 
 	vector<Bullet> bullets;
 	bullets.push_back(Bullet()); //for safety
+	bullets[0].pos.x = 10000;
+	bullets[0].pos.y = 10000;
+
 	vector<RectangleShape> bullet_sprites;
 	bullet_sprites.push_back(RectangleShape()); 
 
@@ -207,14 +236,8 @@ int main()
 			stupid_variable -= 1;
 		}
 
-		if (enemy_clock.getElapsedTime().asSeconds() > 5)
-		{
-			enemies.push_back(Enemy());
-			enemy_sprites.push_back(RectangleShape(Vector2f(30, 30)));
-			enemy_clock.restart();
-		}
 
-		enemy1.SpawnEnemy(enemies, enemy1.clock.getElapsedTime().asSeconds());
+		Enemy::SpawnEnemy(enemies, enemy_sprites, enemy_clock);
 		player.UpdatePos();
 		player_sprite.setPosition(player.pos.x, player.pos.y);
 		player.spd.x = 0;
@@ -222,20 +245,38 @@ int main()
 		for (int i = 0; i < bullets.size(); i++)
 		{
 			bullets[i].UpdatePos();
-			Objects::CheckCollisionsForX(bullets[i], enemy1); // only checks against one enemy should check against all (TODO)
+			
+			
+			for (int j = 0; j < enemies.size(); j++)
+			{
+				if (enemies[j].isAlive == true)
+				{
+					Objects::CheckCollisionsForX(bullets[i], enemies[j]);
+				}
+			}
+			
 		}
+
 
 		window.clear(Color::Color(0, 25, 51));
 
 
-		window.draw(player_sprite);
-		window.draw(crosshair);
+		
 		for (int i = 0; i < bullets.size(); i++)
 		{
 			bullet_sprites[i].setPosition(bullets[i].pos.x, bullets[i].pos.y);
 			window.draw(bullet_sprites[i]);
 		}
-		
+		for (int i = 0; i < enemies.size(); i++)
+		{
+			if (enemies[i].isAlive == true)
+			{
+				enemy_sprites[i].setPosition(enemies[i].pos.x, enemies[i].pos.y);
+				window.draw(enemy_sprites[i]);
+			}
+		}
+		window.draw(player_sprite);
+		window.draw(crosshair);
 		window.display();
 
 	}
