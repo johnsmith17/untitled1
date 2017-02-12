@@ -23,6 +23,7 @@ public:
 	Vector2f pos;
 	Vector2f spd;
 	
+
 	void UpdatePos()
 	{
 		if (spd.x != 0.f && spd.y != 0.f)
@@ -80,13 +81,13 @@ public:
 	float height = 30;
 	int health = 10;
 
-	static void SpawnEnemy(vector<Enemy>& vec, vector<RectangleShape>& sprite_vec, Clock &time)
+	static void SpawnEnemy(vector<Enemy> &vec, vector<RectangleShape> &sprite_vec, Clock &time)
 	{
 		if (time.getElapsedTime().asSeconds() > 5)
 		{
 			vec.push_back(Enemy());
 			sprite_vec.push_back(RectangleShape(Vector2f(vec[vec.size()-1].width, vec[vec.size() - 1].height)));
-			vec[vec.size()-1].pos = { float(rand() % int(screen_x- vec[vec.size() - 1].width)) ,float(rand() % int(screen_y- vec[vec.size() - 1].height)) }; // add better randomness
+			vec[vec.size()-1].pos = { float(rand() % int(screen_x- vec[vec.size() - 1].width)) ,float(rand() % int(screen_y- vec[vec.size() - 1].height)) }; 
 			time.restart();
 		}
 	}
@@ -102,7 +103,7 @@ public:
 class Objects
 {
 public:
-	static void CheckCollisionsForY(Bullet b, Enemy e)
+	static void CheckCollisionsForY(Bullet &b, Enemy &e)
 	{
 		if (b.pos.y < e.pos.y + e.height && b.pos.y + b.height > e.pos.y + e.height)
 		{
@@ -122,12 +123,11 @@ public:
 			cout << "hello";
 		}
 	}
-	static void CheckCollisionsForX(Bullet b, Enemy e)
+	static void CheckCollisionsForX(Bullet &b, Enemy &e)
 	{
 		if (b.pos.x + b.width > e.pos.x && b.pos.x < e.pos.x)
 		{
 			CheckCollisionsForY(b, e);
-
 		}
 
 		else if (b.pos.x > e.pos.x && b.pos.x + b.width < e.pos.x + e.width)
@@ -246,22 +246,15 @@ int main()
 		{
 			bullets[i].UpdatePos();
 			
-			
 			for (int j = 0; j < enemies.size(); j++)
 			{
-				if (enemies[j].isAlive == true)
-				{
-					Objects::CheckCollisionsForX(bullets[i], enemies[j]);
-				}
+				Objects::CheckCollisionsForX(bullets[i], enemies[j]);
 			}
 			
 		}
 
-
 		window.clear(Color::Color(0, 25, 51));
 
-
-		
 		for (int i = 0; i < bullets.size(); i++)
 		{
 			bullet_sprites[i].setPosition(bullets[i].pos.x, bullets[i].pos.y);
