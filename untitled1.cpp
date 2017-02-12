@@ -83,7 +83,7 @@ public:
 
 	static void SpawnEnemy(vector<Enemy> &vec, vector<RectangleShape> &sprite_vec, Clock &time)
 	{
-		if (time.getElapsedTime().asSeconds() > 5)
+		if (time.getElapsedTime().asSeconds() > 2)
 		{
 			vec.push_back(Enemy());
 			sprite_vec.push_back(RectangleShape(Vector2f(vec[vec.size()-1].width, vec[vec.size() - 1].height)));
@@ -108,19 +108,20 @@ public:
 		if (b.pos.y < e.pos.y + e.height && b.pos.y + b.height > e.pos.y + e.height)
 		{
 			e.isAlive = false;
-			cout << "hello";
+			b.isActive = false;
+			
 		}
 
 		else if (b.pos.y + b.height > e.pos.y && b.pos.y < e.pos.y)
 		{
 			e.isAlive = false;
-			cout << "hello";
+			b.isActive = false;
 		}
 
 		else if (b.pos.y > e.pos.y && b.pos.y + b.height < e.pos.y + e.height)
 		{
 			e.isAlive = false;
-			cout << "hello";
+			b.isActive = false;
 		}
 	}
 	static void CheckCollisionsForX(Bullet &b, Enemy &e)
@@ -145,7 +146,7 @@ public:
 	{
 		if (bul.pos.x > screen_x || bul.pos.x < 0 || bul.pos.y > screen_y || bul.pos.y < 0)
 		{
-
+			bul.isActive = false;
 		}
 		
 	}
@@ -245,10 +246,15 @@ int main()
 		for (int i = 0; i < bullets.size(); i++)
 		{
 			bullets[i].UpdatePos();
+			Objects::RemoveBullet(bullets[i]);
+			
 			
 			for (int j = 0; j < enemies.size(); j++)
 			{
-				Objects::CheckCollisionsForX(bullets[i], enemies[j]);
+				if (enemies[j].isAlive == true)
+				{
+					Objects::CheckCollisionsForX(bullets[i], enemies[j]);
+				}
 			}
 			
 		}
@@ -257,8 +263,11 @@ int main()
 
 		for (int i = 0; i < bullets.size(); i++)
 		{
-			bullet_sprites[i].setPosition(bullets[i].pos.x, bullets[i].pos.y);
-			window.draw(bullet_sprites[i]);
+			if (bullets[i].isActive == true) 
+			{
+				bullet_sprites[i].setPosition(bullets[i].pos.x, bullets[i].pos.y);
+				window.draw(bullet_sprites[i]);
+			}
 		}
 		for (int i = 0; i < enemies.size(); i++)
 		{
