@@ -89,48 +89,49 @@ public:
 
 class Objects
 {
+public:
+	static void CheckCollisionsForY(Bullet b, Enemy e)
+	{
+		if (b.pos.y < e.pos.y + e.height && b.pos.y + b.height > e.pos.y + e.height)
+		{
+			//e.kill();
+		}
 
+		else if (b.pos.y + b.height > e.pos.y && b.pos.y < e.pos.y)
+		{
+			//e.kill()
+		}
+
+		else if (b.pos.y > e.pos.y && b.pos.y + b.height < e.pos.y + e.height)
+		{
+			//e.kill()
+		}
+	}
+	static void CheckCollisionsForX(Bullet b, Enemy e)
+	{
+		if (b.pos.x + b.width > e.pos.x && b.pos.x < e.pos.x)
+		{
+			CheckCollisionsForY(b, e);
+		}
+
+		else if (b.pos.x > e.pos.x && b.pos.x + b.width < e.pos.x + e.width)
+		{
+			CheckCollisionsForY(b, e);
+		}
+
+		else if (b.pos.x > e.pos.x && b.pos.x < e.pos.x + e.width)
+		{
+			CheckCollisionsForY(b, e);
+		}
+	}
 };
-
-void CheckCollisionsForY(Bullet b, Enemy e)
-{
-	if (b.pos.y < e.pos.y + e.height && b.pos.y + b.height > e.pos.y + e.height)
-	{
-		//e.kill();
-	}
-
-	else if (b.pos.y + b.height > e.pos.y && b.pos.y < e.pos.y)
-	{
-		//e.kill()
-	}
-
-	else if (b.pos.y > e.pos.y && b.pos.y + b.height < e.pos.y + e.height)
-	{
-		//e.kill()
-	}
-}
-void CheckCollisionsForX(Bullet b, Enemy e)
-{
-	if (b.pos.x + b.width > e.pos.x && b.pos.x < e.pos.x)
-	{
-		CheckCollisionsForY(b, e);
-	}
-
-	else if (b.pos.x > e.pos.x && b.pos.x + b.width < e.pos.x + e.width)
-	{
-		CheckCollisionsForY(b, e);
-	}
-
-	else if (b.pos.x > e.pos.x && b.pos.x < e.pos.x + e.width)
-	{
-		CheckCollisionsForY(b, e);
-	}
-}
 
 int main()
 {
 	Time time;
 	Clock clock;
+	Clock enemy_clock;
+	enemy_clock.restart();
 
 	Enemy enemy1;
 
@@ -152,13 +153,15 @@ int main()
 
 	vector<Enemy> enemies;
 	enemies.push_back(Enemy());
-	RectangleShape enemy_sprite(Vector2f(enemy1.width, enemy1.height));
-	enemy_sprite.setFillColor(Color:: Color(153,0,153));
+	vector<RectangleShape> enemy_sprites;
+	
 
 	vector<Bullet> bullets;
 	bullets.push_back(Bullet()); //for safety
 	vector<RectangleShape> bullet_sprites;
 	bullet_sprites.push_back(RectangleShape()); 
+
+
 
 	while (window.isOpen())
 	{
@@ -185,6 +188,7 @@ int main()
 		if (Keyboard::isKeyPressed(Keyboard::A))
 		{
 			player.spd.x = -player.spd_mod;
+
 		}
 		if (Keyboard::isKeyPressed(Keyboard::D))
 		{
@@ -195,12 +199,19 @@ int main()
 		{
 			bullets.push_back(Bullet());
 			bullets[bullets.size()-1].isActive = true;
-			bullets[bullets.size() - 1].pos = player.pos;
+			bullets[bullets.size()-1].pos = player.pos;
 			bullets[bullets.size()-1].SetSpeed(player.pos, mouse_pos, 10);
 			bullet_sprites.push_back(RectangleShape(Vector2f(5, 5)));
 			bullet_sprites[bullet_sprites.size()-1].setFillColor(Color::Yellow);
 			clock.restart();
 			stupid_variable -= 1;
+		}
+
+		if (enemy_clock.getElapsedTime().asSeconds() > 5)
+		{
+			enemies.push_back(Enemy());
+			enemy_sprites.push_back(RectangleShape(Vector2f(30, 30)));
+			enemy_clock.restart();
 		}
 
 		enemy1.SpawnEnemy(enemies, enemy1.clock.getElapsedTime().asSeconds());
@@ -211,7 +222,7 @@ int main()
 		for (int i = 0; i < bullets.size(); i++)
 		{
 			bullets[i].UpdatePos();
-			CheckCollisionsForX(bullets[i], enemy1);
+			Objects::CheckCollisionsForX(bullets[i], enemy1); // only checks against one enemy should check against all (TODO)
 		}
 
 		window.clear(Color::Color(0, 25, 51));
@@ -224,7 +235,7 @@ int main()
 			bullet_sprites[i].setPosition(bullets[i].pos.x, bullets[i].pos.y);
 			window.draw(bullet_sprites[i]);
 		}
-		window.draw(enemy_sprite);
+		
 		window.display();
 
 	}
